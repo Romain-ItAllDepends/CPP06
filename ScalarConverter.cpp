@@ -6,7 +6,7 @@
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:25:19 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/09 15:52:35 by rgobet           ###   ########.fr       */
+/*   Updated: 2024/11/09 16:02:06 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,5 @@ static void	*convert(std::string n) {
 		std::cout << "int: impossible" << std::endl;
 	else
 		std::cout << "int: " << verif << std::endl;
-	if ()
+	if (__FLT_MIN__ )
 }
