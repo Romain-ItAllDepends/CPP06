@@ -6,7 +6,7 @@
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:25:19 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/11 15:58:11 by rgobet           ###   ########.fr       */
+/*   Updated: 2024/11/12 15:55:52 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,12 @@ static bool	isDigit(const char *s) {
 	while (s[i]) {
 		if (s[i] == '.')
 			dot++;
-		if ((!(s[i] > 47 && 58 > s[i]) && s[i] != '.') || dot > 1)
-			return (false);
 		if (!s[i + 1] && s[i] == 'f')
 			break;
+		if ((s[i] < 48 || 57 < s[i]) || dot > 1) {
+			if (s[i] != '.' || dot > 1)
+				return (false);
+		}
 		i++;
 	}
 	return (true);
@@ -95,7 +97,7 @@ static bool	isPrintable(std::string str) {
 	
 	strcpy(x, str.c_str());
 	c = atoi(x);
-	if (str.length() > 3 || isDigit(x) == false)
+	if (str.length() > 1 || isDigit(x) == false)
 		return (false);
 	return (true);
 }
@@ -133,23 +135,25 @@ void	ScalarConverter::convert(std::string n) {
 
 	/* CHAR */ /* DONE (but need to verify the convertion float to char) */
 
-	if (isDisplayable(n) == false)
-		std::cout << "char: Non displayable" << std::endl;
-	else if (verif < 0 || verif > 128 || isPrintable(n))
+	if (verif < 0 || verif > 128 || isPrintable(n) || (isDigit(x) == 0 && n.length() > 1))
 		std::cout << "char: impossible" << std::endl;
+	else if (isDisplayable(n) == false)
+		std::cout << "char: Non displayable" << std::endl;
 	else
 		std::cout << "char: '" << convertChar(n) << "'" << std::endl;
 
 	/* INT */ /* DONE */
-	std::cout << isDigit(x) << std::endl;
-	if (verif > 2147483647 || -2147483648 > verif || isDigit(x))
+	
+	if (verif > 2147483647 || -2147483648 > verif || isDigit(x) == 0)
 		std::cout << "int: impossible" << std::endl;
 	else
 		std::cout << "int: " << verif << std::endl;
 
 	/* FLOAT */
 
-	if (verif - convertFloat(n) == 0)
+	if (isDigit(x) == 0)
+		std::cout << "float: impossible" << std::endl;
+	else if (verif - convertFloat(n) == 0)
 		std::cout << "float: " << convertFloat(n) << ".0f" << std::endl;
 	else
 		std::cout << "float: " << convertFloat(n) << "f" << std::endl;
@@ -159,7 +163,9 @@ void	ScalarConverter::convert(std::string n) {
 
 	// /* DOUBLE */
 
-	if (verif - convertFloat(n) == 0)
+	if (isDigit(x) == 0)
+		std::cout << "double: impossible" << std::endl;
+	else if (verif - convertFloat(n) == 0)
 		std::cout << "double: " << convertDouble(n) << ".0" << std::endl;
 	else
 		std::cout << "double: " << convertDouble(n) << std::endl;
