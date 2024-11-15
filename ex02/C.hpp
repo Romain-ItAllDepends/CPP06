@@ -1,22 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   C.hpp                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/15 16:00:58 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/15 16:12:03 by rgobet           ###   ########.fr       */
+/*   Created: 2024/11/15 16:00:55 by rgobet            #+#    #+#             */
+/*   Updated: 2024/11/15 16:10:29 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Base.hpp"
-#include "A.hpp"
-#include "B.hpp"
-#include "C.hpp"
+#ifndef C_HPP
+# define C_HPP
+# include "Base.hpp"
 
-int	main(void) {
-	return (0);
-}
+class C: public Base {
+	
+};
 
-dynamic_cast
+#endif

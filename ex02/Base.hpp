@@ -1,22 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Base.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/15 16:00:58 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/15 16:12:03 by rgobet           ###   ########.fr       */
+/*   Created: 2024/11/15 16:00:50 by rgobet            #+#    #+#             */
+/*   Updated: 2024/11/15 16:10:54 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Base.hpp"
-#include "A.hpp"
-#include "B.hpp"
-#include "C.hpp"
+#ifndef BASE_HPP
+# define BASE_HPP
 
-int	main(void) {
-	return (0);
-}
+class Base {
+	public:
+		virtual ~Base(void);
 
-dynamic_cast
+		void identify(Base* p);
+		void identify(Base& p);
+		Base *generate(void);
+};
+
+#endif
