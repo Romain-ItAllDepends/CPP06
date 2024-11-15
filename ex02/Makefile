@@ -1,7 +1,6 @@
 NAME=convert
 
-MY_SOURCES= main.cpp \
-			ScalarConverter.cpp
+MY_SOURCES= main.cpp
 
 red='\033[0;31m'
 green='\033[0;32m'
@@ -24,7 +23,7 @@ MY_OBJECTS=$(MY_SOURCES:.cpp=.o)
 RM=rm -f
 
 CXX=c++
-CXXFLAGS=-Wall -Werror -Wextra -std=c++98 -g
+CXXFLAGS=-Wall -Werror -Wextra -std=c++98
 
 all: $(NAME)
 

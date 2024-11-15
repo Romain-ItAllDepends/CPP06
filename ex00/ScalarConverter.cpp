@@ -6,7 +6,7 @@
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:25:19 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/12 15:55:52 by rgobet           ###   ########.fr       */
+/*   Updated: 2024/11/15 14:15:39 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,13 @@ ScalarConverter const & ScalarConverter::operator=(ScalarConverter const &a) {
     return *this;
 }
 
-static bool	isDigit(const char *s) {
-	int	i = 0;
+static bool	isDigit(const std::string s) {
+	unsigned long	i = 0;
 	int	dot = 0;
 	
-	while (s[i]) {
+	if (s[0] == '+' || s[0] == '-')
+		i = 1;
+	while (i < s.length()) {
 		if (s[i] == '.')
 			dot++;
 		if (!s[i + 1] && s[i] == 'f')
@@ -45,6 +47,40 @@ static bool	isDigit(const char *s) {
 		}
 		i++;
 	}
+	if (dot > 1)
+		return (false);
+	return (true);
+}
+
+static bool isFloat(const std::string s) {
+	unsigned long	i = 0;
+	int				dot = 0;
+
+	if (s.empty() || s[s.length() - 1] != 'f')
+		return (false);
+	if (s[0] == '+' || s[0] == '-')
+		i = 1;
+	while (i < s.length() - 1) {
+		if (s[i] == '.')
+			dot++;
+		if (dot > 1 || !isdigit(s[i]))
+			return (false);
+		i++;
+	}
+	if (dot > 1)
+		return (false);
+	return (true);
+}
+
+static bool isDouble(const std::string s) {
+	char	*null;
+	char	x[s.length() + 1];
+	double	n;
+
+	strcpy(x, s.c_str());
+	n = strtod(x, &null);
+	if (null[0] != 0 || null == s)
+		return (false);
 	return (true);
 }
 
@@ -115,9 +151,6 @@ static bool	isDisplayable(std::string str) {
 
 void	ScalarConverter::convert(std::string n) {
 	const long	verif = convertLong(n);
-	char	x[n.length() + 1];
-	
-	strcpy(x, n.c_str());
 	
 	/* EXCEPTION */ /* Maybe useless */
 
@@ -135,7 +168,7 @@ void	ScalarConverter::convert(std::string n) {
 
 	/* CHAR */ /* DONE (but need to verify the convertion float to char) */
 
-	if (verif < 0 || verif > 128 || isPrintable(n) || (isDigit(x) == 0 && n.length() > 1))
+	if (verif < 0 || verif > 128 || isPrintable(n) || (isDigit(n) == 0 && n.length() > 1))
 		std::cout << "char: impossible" << std::endl;
 	else if (isDisplayable(n) == false)
 		std::cout << "char: Non displayable" << std::endl;
@@ -144,32 +177,26 @@ void	ScalarConverter::convert(std::string n) {
 
 	/* INT */ /* DONE */
 	
-	if (verif > 2147483647 || -2147483648 > verif || isDigit(x) == 0)
+	if (verif > 2147483647 || -2147483648 > verif || isDigit(n) == 0 || n.empty())
 		std::cout << "int: impossible" << std::endl;
 	else
 		std::cout << "int: " << verif << std::endl;
 
 	/* FLOAT */
 
-	if (isDigit(x) == 0)
+	if (isDigit(n) == 0 || isFloat(n))
 		std::cout << "float: impossible" << std::endl;
 	else if (verif - convertFloat(n) == 0)
 		std::cout << "float: " << convertFloat(n) << ".0f" << std::endl;
 	else
 		std::cout << "float: " << convertFloat(n) << "f" << std::endl;
-	// if (__FLT_MIN__ ) // Verif la range en entier
-	// else if (n == "nan")
-	// 	std::cout << "float: nanf" << std::endl;
 
 	// /* DOUBLE */
 
-	if (isDigit(x) == 0)
+	if (isDigit(n) == 0 || isDouble(n) == 0)
 		std::cout << "double: impossible" << std::endl;
 	else if (verif - convertFloat(n) == 0)
 		std::cout << "double: " << convertDouble(n) << ".0" << std::endl;
 	else
 		std::cout << "double: " << convertDouble(n) << std::endl;
-	// if (n == "nan") // Verif la range en entier
-	// 	std::cout << "double: nan" << std::endl;
-
 }
