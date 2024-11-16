@@ -1,10 +1,7 @@
 NAME=identify
 
 MY_SOURCES= main.cpp \
-			Base.cpp \
-			A.cpp \
-			B.cpp \
-			C.cpp
+			Base.cpp
 
 red='\033[0;31m'
 green='\033[0;32m'
