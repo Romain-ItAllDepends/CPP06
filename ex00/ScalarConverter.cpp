@@ -6,7 +6,7 @@
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:25:19 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/29 10:49:32 by rgobet           ###   ########.fr       */
+/*   Updated: 2024/11/29 15:47:18 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,12 +89,12 @@ static bool	isDigit(const std::string s) {
 	int		x = 0;
 
 	strcpy(str, s.c_str());
-	x = std::atoi(str);
+	x = std::strtold(str, NULL);
 	if (verifyDigit(s) == false && s.length() > 1)
 		return (false);
 	if (s.length() == 1 && !(str[0] >= '0' && str[0] <= '9'))
 		return (true);
-	if (x == 0 && str[0] == '0')
+	if (x == 0 && str[0] != '0')
 		return (false);
 	for (size_t i = 0 ; i < s.length() ; i++) {
 		if (str[i] == '0')
@@ -119,12 +119,12 @@ static bool isFloat(const std::string s) {
 	int		x = 0;
 
 	strcpy(str, s.c_str());
-	x = std::strtold(str, NULL);
+	x = std::strtof(str, NULL);
 	if (verifyFloat(s) && s.length() > 1)
 		return (false);
 	if (s.length() == 1 && !(str[0] >= '0' && str[0] <= '9'))
 		return (true);
-	if (x == 0 && str[0] == '0')
+	if (x == 0 && str[0] != '0')
 		return (false);
 	for (size_t i = 0 ; i < s.length() ; i++) {
 		if (str[i] == '0')
@@ -153,7 +153,9 @@ static char	convertChar(std::string c) {
 	char	x[c.length() + 1];
 
 	strcpy(x, c.c_str());
-	return (x[0]);
+	if (c.length() != 1)
+		return (static_cast<char>(std::atoi(x)));
+	return (static_cast<char>(x[0]));
 }
 
 static double	convertDouble(std::string d) {
@@ -198,20 +200,27 @@ static long	convertInt(std::string i) {
 
 static bool	isPrintable(std::string str) {
 	char	x[str.length() + 1];
-	int	i = 0;
-	int	c = 0;
+	int		i = 0;
+	int		c = 0;
 	
 	strcpy(x, str.c_str());
 	c = std::atoi(x);
+	if ((c == 0 && x[0] == '0' && str.length() == 1) || c != 0) {
+		if (c >= 0 && c < 128)
+			return (true);
+	}
 	if (c == 0 && x[0] != '0') {
 		while (x[i]) {
-			if (x[i] > 127 || x[i] < 0) {
+			if (x[i] > 127 || x[i] < 0)
 				return (false);
-			}
+			if (str.length() != 1 && (x[i] < '0' || x[i] > '9'))
+				return (false);
 			i++;
 		}
 		return (true);
 	}
+	else if (c < 0 || c > 127)
+		return (false);
 	return (true);
 }
 
@@ -221,9 +230,39 @@ static bool	isDisplayable(std::string str) {
 	
 	strcpy(x, str.c_str());
 	c = std::atoi(x);
-	if (c == 0 && x[0] != '0' && x[0] <= 32 && x[0] > 127 && str.length() > 1)
+	if (((c == 0 && x[0] == '0' && str.length() == 1)
+		|| c != 0) || (str.length() == 1 && x[0] != '0')) {
+		if ((c < 32 || c == 127))
+			return (false);
+	}
+	if (c == 0 && x[0] != '0' && x[0] < 32 && x[0] >= 127 && str.length() > 1)
 		return (false);
 	return (true);
+}
+
+static bool	isInf(std::string n) {
+	std::string	testp = "99999999999999999999999999999999999999999999999";
+	std::string	testm = "-99999999999999999999999999999999999999999999999";
+
+	if (n[0] == '-' && std::strtof(n.c_str(), NULL) != std::strtof(testm.c_str(), NULL))
+		return (false);
+	if (n[0] != '-' && std::strtof(n.c_str(), NULL) != std::strtof(testp.c_str(), NULL))
+		return (false);
+	return (true);
+}
+
+static void	infFloat(std::string n) {
+	if (n[0] == '-')
+		std::cout << "float: -inf" << std::endl;
+	else
+		std::cout << "float: +inf" << std::endl;
+}
+
+static void	infDouble(std::string n) {
+	if (n[0] == '-')
+		std::cout << "double: -inf" << std::endl;
+	else
+		std::cout << "double: +inf" << std::endl;
 }
 
 void	ScalarConverter::convert(std::string n) {
@@ -243,18 +282,19 @@ void	ScalarConverter::convert(std::string n) {
 		return ;
 	}
 
-	/* CHAR */ /* DONE (but need to verify the convertion float to char) */
 
-	if (verif < 0 || verif > 128 || n.length() != 1 || isPrintable(n) == false || (isDigit(n) == 0 && n.length() > 1))
+	/* CHAR */ // Non displayble full bugé et caractere unique aussi et conversion int to ascii
+	// Normalement good / inf print non displayble
+	if (isPrintable(n) == false)
 		std::cout << "char: impossible" << std::endl;
-	else if (isDisplayable(n) == false)
+	else if (isPrintable(n) == true && isDisplayable(n) == false)
 		std::cout << "char: Non displayable" << std::endl;
 	else
 		std::cout << "char: '" << convertChar(n) << "'" << std::endl;
 
-	/* INT */ /* DONE */
+	/* INT */ // inf.0f/inf.0/nombre negatif / inf -> +inf/-inf/+inff/-inff
 
-	if (isNotInteger(verif, n) || isDigit(n) == 0 || n.empty())
+	if (isNotInteger(verif, n) == true || isDigit(n) == 0 || n.empty())
 		std::cout << "int: impossible" << std::endl;
 	else
 		std::cout << "int: " << convertInt(n) << std::endl;
@@ -263,25 +303,29 @@ void	ScalarConverter::convert(std::string n) {
 
 	if (isDigit(n) == 0 || isFloat(n) == 0)
 		std::cout << "float: impossible" << std::endl;
-	else if (isFloat(n) == true && ((n[n.length() - 3] == '.'
+	else if (isInf(n) == false && isFloat(n) == true && ((n[n.length() - 3] == '.'
 		&& n[n.length() - 1] == 'f' && n[n.length() - 2] == '0')
 		|| (n[n.length() - 2] == '.' && n[n.length() - 1] == '0')))
 		std::cout << "float: " << convertFloat(n) << ".0f" << std::endl;
-	else if (isFloat(n) == true && noDot(n) == true)
+	else if (isFloat(n) == true && noDot(n) == true && isInf(n) == false)
 		std::cout << "float: " << convertFloat(n) << ".0f" << std::endl;
-	else
+	else if (isInf(n) == false)
 		std::cout << "float: " << convertFloat(n) << "f" << std::endl;
+	else if (isFloat(n) == true && isInf(n) == true)
+		infFloat(n);
 
 	// /* DOUBLE */
 
 	if (isDigit(n) == 0 || isDouble(n) == 0)
 		std::cout << "double: impossible" << std::endl;
-	else if (isDouble(n) == true && ((n[n.length() - 3] == '.'
+	else if (isInf(n) == false && isDouble(n) == true && ((n[n.length() - 3] == '.'
 		&& n[n.length() - 1] == 'f' && n[n.length() - 2] == '0')
 		|| (n[n.length() - 2] == '.' && n[n.length() - 1] == '0')))
 		std::cout << "double: " << convertDouble(n) << ".0" << std::endl;
-	else if (isDouble(n) == true && noDot(n) == true)
+	else if (isDouble(n) == true && noDot(n) == true && isInf(n) == false)
 		std::cout << "double: " << convertDouble(n) << ".0" << std::endl;
-	else
+	else if (isDouble(n) == true && isInf(n) == false)
 		std::cout << "double: " << convertDouble(n) << std::endl;
+	else
+		infDouble(n);
 }
