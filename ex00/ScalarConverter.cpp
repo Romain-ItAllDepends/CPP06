@@ -6,7 +6,7 @@
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:25:19 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/15 14:15:39 by rgobet           ###   ########.fr       */
+/*   Updated: 2024/11/29 10:49:32 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,18 @@ ScalarConverter const & ScalarConverter::operator=(ScalarConverter const &a) {
     return *this;
 }
 
-static bool	isDigit(const std::string s) {
+static bool	isNotInteger(const long l, const std::string n) {
+	char	str[n.length() + 1];
+
+	strcpy(str, n.c_str());
+	if (l > 2147483647 || -2147483648 > l || (l == 0 && str[0] != '0')) {
+		if (n.length() > 1)
+			return (true);
+	}
+	return (false);
+}
+
+static bool	verifyDigit(const std::string s) {
 	unsigned long	i = 0;
 	int	dot = 0;
 	
@@ -52,7 +63,7 @@ static bool	isDigit(const std::string s) {
 	return (true);
 }
 
-static bool isFloat(const std::string s) {
+static bool verifyFloat(const std::string s) {
 	unsigned long	i = 0;
 	int				dot = 0;
 
@@ -72,69 +83,135 @@ static bool isFloat(const std::string s) {
 	return (true);
 }
 
-static bool isDouble(const std::string s) {
-	char	*null;
-	char	x[s.length() + 1];
-	double	n;
+static bool	isDigit(const std::string s) {
+	char	str[s.length() + 1];
+	size_t	count = 0;
+	int		x = 0;
 
-	strcpy(x, s.c_str());
-	n = strtod(x, &null);
-	if (null[0] != 0 || null == s)
+	strcpy(str, s.c_str());
+	x = std::atoi(str);
+	if (verifyDigit(s) == false && s.length() > 1)
+		return (false);
+	if (s.length() == 1 && !(str[0] >= '0' && str[0] <= '9'))
+		return (true);
+	if (x == 0 && str[0] == '0')
+		return (false);
+	for (size_t i = 0 ; i < s.length() ; i++) {
+		if (str[i] == '0')
+			count++;
+	}
+	if (s.length() > 1 && x == 0 && count != s.length() && str[0] == '0')
 		return (false);
 	return (true);
 }
 
-static char	tmp(char *s) {
-	int	i = 0;
-	int	tmp = 0;
-	int	sign = 1;
-
-	if (s[0] == '-')
-		sign *= 1;
-	while (s[i] && s[i] != '.') {
-		tmp *= 10;
-		tmp += s[i] - 48;
-		i++;
+static bool	noDot(std::string const n) {
+	for (size_t i = 0 ; i < n.length() ; i++) {
+		if (n[i] == '.')
+			return (false);
 	}
-	return (tmp * sign);
+	return (true);
+}
+
+static bool isFloat(const std::string s) {
+	char	str[s.length() + 1];
+	size_t	count = 0;
+	int		x = 0;
+
+	strcpy(str, s.c_str());
+	x = std::strtold(str, NULL);
+	if (verifyFloat(s) && s.length() > 1)
+		return (false);
+	if (s.length() == 1 && !(str[0] >= '0' && str[0] <= '9'))
+		return (true);
+	if (x == 0 && str[0] == '0')
+		return (false);
+	for (size_t i = 0 ; i < s.length() ; i++) {
+		if (str[i] == '0')
+			count++;
+	}
+	if (s.length() > 1 && x == 0 && count != s.length())
+		return (false);
+	return (true);
+}
+
+
+static bool isDouble(const std::string s) {
+	char	x[s.length() + 1];
+	double	n;
+
+	strcpy(x, s.c_str());
+	n = std::strtod(x, NULL);
+	if (verifyDigit(s) == false && s.length() > 1)
+		return (false);
+	if (s.length() == 1 && !(x[0] >= '0' && x[0] <= '9'))
+		return (true);
+	return (true);
 }
 
 static char	convertChar(std::string c) {
 	char	x[c.length() + 1];
 
 	strcpy(x, c.c_str());
-	return (tmp(x));
+	return (x[0]);
 }
 
 static double	convertDouble(std::string d) {
 	char	x[d.length() + 1];
 
 	strcpy(x, d.c_str());
-	return (static_cast<double>(strtold(x, NULL)));
+	if (d.length() == 1 && !(x[0] >= '0' && x[0] <= '9')) {
+		return (static_cast<double>(x[0]));
+	}
+	return (static_cast<double>(std::strtold(x, NULL)));
 }
 
 static float	convertFloat(std::string f) {
 	char	x[f.length() + 1];
 
 	strcpy(x, f.c_str());
-	return (static_cast<float>(strtold(x, NULL)));
+	if (f.length() == 1 && !(x[0] >= '0' && x[0] <= '9')) {
+		return (static_cast<float>(x[0]));
+	}
+	return (static_cast<float>(std::strtold(x, NULL)));
 }
 
 static long	convertLong(std::string l) {
 	char	x[l.length() + 1];
 
 	strcpy(x, l.c_str());
-	return (static_cast<long>(strtoll(x, NULL, 10)));
+	if (l.length() == 1 && !(x[0] >= '0' && x[0] <= '9')) {
+		return (static_cast<long>(x[0]));
+	}
+	return (static_cast<long>(std::strtoll(x, NULL, 10)));
+}
+
+static long	convertInt(std::string i) {
+	char	x[i.length() + 1];
+
+	strcpy(x, i.c_str());
+	if (i.length() == 1 && !(x[0] >= '0' && x[0] <= '9')) {
+		return (static_cast<int>(x[0]));
+	}
+	return (static_cast<int>(std::atoi(x)));
 }
 
 static bool	isPrintable(std::string str) {
 	char	x[str.length() + 1];
-	int	c;
+	int	i = 0;
+	int	c = 0;
 	
 	strcpy(x, str.c_str());
-	c = atoi(x);
-	if (str.length() > 1 || isDigit(x) == false)
-		return (false);
+	c = std::atoi(x);
+	if (c == 0 && x[0] != '0') {
+		while (x[i]) {
+			if (x[i] > 127 || x[i] < 0) {
+				return (false);
+			}
+			i++;
+		}
+		return (true);
+	}
 	return (true);
 }
 
@@ -143,8 +220,8 @@ static bool	isDisplayable(std::string str) {
 	int	c;
 	
 	strcpy(x, str.c_str());
-	c = atoi(x);
-	if (!(c < 127 && c > 31))
+	c = std::atoi(x);
+	if (c == 0 && x[0] != '0' && x[0] <= 32 && x[0] > 127 && str.length() > 1)
 		return (false);
 	return (true);
 }
@@ -152,7 +229,7 @@ static bool	isDisplayable(std::string str) {
 void	ScalarConverter::convert(std::string n) {
 	const long	verif = convertLong(n);
 	
-	/* EXCEPTION */ /* Maybe useless */
+	/* EXCEPTION */
 
 	if (n == "nan" || n == "nanf" || n == "-inf" || n == "+inf"
 		|| n == "-inff" || n == "+inff") {
@@ -168,7 +245,7 @@ void	ScalarConverter::convert(std::string n) {
 
 	/* CHAR */ /* DONE (but need to verify the convertion float to char) */
 
-	if (verif < 0 || verif > 128 || isPrintable(n) || (isDigit(n) == 0 && n.length() > 1))
+	if (verif < 0 || verif > 128 || n.length() != 1 || isPrintable(n) == false || (isDigit(n) == 0 && n.length() > 1))
 		std::cout << "char: impossible" << std::endl;
 	else if (isDisplayable(n) == false)
 		std::cout << "char: Non displayable" << std::endl;
@@ -176,17 +253,21 @@ void	ScalarConverter::convert(std::string n) {
 		std::cout << "char: '" << convertChar(n) << "'" << std::endl;
 
 	/* INT */ /* DONE */
-	
-	if (verif > 2147483647 || -2147483648 > verif || isDigit(n) == 0 || n.empty())
+
+	if (isNotInteger(verif, n) || isDigit(n) == 0 || n.empty())
 		std::cout << "int: impossible" << std::endl;
 	else
-		std::cout << "int: " << verif << std::endl;
+		std::cout << "int: " << convertInt(n) << std::endl;
 
 	/* FLOAT */
 
-	if (isDigit(n) == 0 || isFloat(n))
+	if (isDigit(n) == 0 || isFloat(n) == 0)
 		std::cout << "float: impossible" << std::endl;
-	else if (verif - convertFloat(n) == 0)
+	else if (isFloat(n) == true && ((n[n.length() - 3] == '.'
+		&& n[n.length() - 1] == 'f' && n[n.length() - 2] == '0')
+		|| (n[n.length() - 2] == '.' && n[n.length() - 1] == '0')))
+		std::cout << "float: " << convertFloat(n) << ".0f" << std::endl;
+	else if (isFloat(n) == true && noDot(n) == true)
 		std::cout << "float: " << convertFloat(n) << ".0f" << std::endl;
 	else
 		std::cout << "float: " << convertFloat(n) << "f" << std::endl;
@@ -195,7 +276,11 @@ void	ScalarConverter::convert(std::string n) {
 
 	if (isDigit(n) == 0 || isDouble(n) == 0)
 		std::cout << "double: impossible" << std::endl;
-	else if (verif - convertFloat(n) == 0)
+	else if (isDouble(n) == true && ((n[n.length() - 3] == '.'
+		&& n[n.length() - 1] == 'f' && n[n.length() - 2] == '0')
+		|| (n[n.length() - 2] == '.' && n[n.length() - 1] == '0')))
+		std::cout << "double: " << convertDouble(n) << ".0" << std::endl;
+	else if (isDouble(n) == true && noDot(n) == true)
 		std::cout << "double: " << convertDouble(n) << ".0" << std::endl;
 	else
 		std::cout << "double: " << convertDouble(n) << std::endl;

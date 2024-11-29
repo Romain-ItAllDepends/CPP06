@@ -6,7 +6,7 @@
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/15 16:00:58 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/16 11:53:46 by rgobet           ###   ########.fr       */
+/*   Updated: 2024/11/29 11:11:47 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ Base *generate(void) {
 int	main(void) {
 	srand (time(NULL));
 	Base	*test = generate();
+	// B		*test2 = NULL;
+	// Base	&test1 = *test2;
 	Base	&test1 = *test;
 
 	identify(test1);
