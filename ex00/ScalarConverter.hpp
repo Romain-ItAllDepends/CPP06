@@ -6,7 +6,7 @@
 /*   By: rgobet <rgobet@student.42angouleme.fr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:25:14 by rgobet            #+#    #+#             */
-/*   Updated: 2024/11/11 15:47:48 by rgobet           ###   ########.fr       */
+/*   Updated: 2024/12/03 09:15:36 by rgobet           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@
 # include <string.h>
 
 class ScalarConverter {
-	public:
+	private:
 		ScalarConverter(void);
+	public:
 		ScalarConverter(ScalarConverter const &obj);
 		~ScalarConverter(void);
 		ScalarConverter const &operator=(ScalarConverter const &a);
